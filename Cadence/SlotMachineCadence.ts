@@ -81,38 +81,49 @@ const slotMachineCadences: RoundsCadences = { roundOne: [], roundTwo: [], roundT
  * @returns SlotCadence Array of numbers representing the slot machine stop cadence.
  */
 
+//function that receive four parameters 
   function calculateCadence(specialSymbols: SlotCoordinate[], columns: number, defaultCadence: number,anticipateCadence: number):  number[] {
     
+    //array that has the 'columns' length and fill it with 'defaultCadence'
     let cadence = Array(columns).fill(defaultCadence);
+    //create an array that has two columns of special symbols starting from the 'specialSymbols' parameters
     let specialSymbolColumns = specialSymbols.map(symbol => symbol.column);
 
+    //iterates over the 'cadence' array and for each column that contais the exactly special symbol it update the cadence
     for (let i = 0; i < cadence.length; i++) {
       let count = specialSymbolColumns.filter(column => column === i).length;
-      if (count >= 1 && count <= 2) {
+      if (count === 1) {
       cadence[i] = anticipateCadence;
      }
     }
-
+    //iterates over the 'cadence' array and for each column that contais two exactly special symbols it update the cadence to the default value
+    for (let i = 0; i < cadence.length; i++) {
+      let count = specialSymbolColumns.filter(column => column === i).length;
+      if (count === 2) {
+          cadence[i] = defaultCadence;
+      }
+  }
+    //accumulate the 'cadence' array values where each element its the sum of all the elements before
     for (let i = 1; i < cadence.length; i++) {
+      //add the current value to the previous one
       cadence[i] += cadence[i - 1];
     }
 
     return cadence;
   }
 
-/** function slotCadence(symbols: Array<SlotCoordinate>): SlotCadence {
-  
-  return [];
-}
-*/
 /**
  * Get all game rounds and return the final cadences of each.
  * @param rounds RoundsSymbols with contains all rounds special symbols positions.
  * @return RoundsCadences has all cadences for each game round.
  */
+
+//coordenate the calculates of each round based on the special symbols returning an object with the cadences
 function handleCadences(rounds: RoundsSymbols): RoundsCadences {
+  //destructs the properies of the objects and assign it to the 'config' object
   const { columnSize, defaultCadence, anticipateCadence } = config;
 
+  //calculate the cadences based on the special symbols
   slotMachineCadences.roundOne = calculateCadence(rounds.roundOne.specialSymbols, columnSize,
     defaultCadence,
     anticipateCadence);
@@ -125,7 +136,7 @@ function handleCadences(rounds: RoundsSymbols): RoundsCadences {
 
   return slotMachineCadences;
 }
-
+//defines the configurations to the cadences calcs
 const config: AnticipatorConfig = {
   columnSize: 5,
   minToAnticipate: 2,
